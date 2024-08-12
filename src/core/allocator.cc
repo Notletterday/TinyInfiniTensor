@@ -27,7 +27,6 @@ namespace infini
         IT_ASSERT(this->ptr == nullptr);
         // pad the size to the multiple of alignment
         size = this->getAlignedSize(size);
-
         // =================================== 作业 ===================================
         // TODO: 设计一个算法来分配内存，返回起始地址偏移量
         // =================================== 作业 ===================================

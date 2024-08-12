@@ -39,7 +39,20 @@ namespace infini
         // TODO：返回经过 clip 操作后的 shape
         // REF: https://onnx.ai/onnx/operators/onnx__Clip.html#clip-13
         // =================================== 作业 ===================================
-        return std::nullopt;
+        if (inputs.empty())
+            return std::nullopt;
+        Shape t = inputs[0]->getDims();
+        auto min = this->getMin();
+        auto max = this->getMax();
+
+        for (size_t i = 0; i < t.size(); i++)
+        {
+            if (min.has_value() && t[i] < static_cast<int>(min.value()))
+                t[i] = static_cast<int>(min.value());
+            if (max.has_value() && t[i] > static_cast<int>(max.value()))
+                t[i] = static_cast<int>(max.value());
+        }
+        return vector<Shape>{t};
     }
 
     std::string ClipObj::toString() const
@@ -58,7 +71,6 @@ namespace infini
     {
         IT_ASSERT(checkValid(graph));
     }
-
     vector<DataType> CastObj::inferDataType(const TensorVec &inputs) const
     {
         // =================================== 作业 ===================================
@@ -66,7 +78,8 @@ namespace infini
         // REF_FILE: src/core/operator.cc
         // REF: https://onnx.ai/onnx/operators/onnx__Cast.html#cast-21
         // =================================== 作业 ===================================
-        return {};
+
+        return {getOutputDataType()};
     }
 
     optional<vector<Shape>> CastObj::inferShape(const TensorVec &inputs)
@@ -75,7 +88,9 @@ namespace infini
         // TODO：返回经过 cast 操作后的 shape
         // REF: https://onnx.ai/onnx/operators/onnx__Cast.html#cast-21
         // =================================== 作业 ===================================
-        return std::nullopt;
+        if (inputs.empty())
+            return std::nullopt;
+        return std::vector<Shape>{inputs[0]->getDims()};
     }
 
     std::string CastObj::toString() const

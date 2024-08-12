@@ -3,15 +3,28 @@
 
 namespace infini {
 
-Shape infer_broadcast(const Shape &A, const Shape &B) {
+    Shape infer_broadcast(const Shape &A, const Shape &B)
+    {
 
-    // =================================== 作业 ===================================
-    // TODO：对 A 和 B 进行双向广播，返回广播后的形状。
-    // REF: https://github.com/onnx/onnx/blob/main/docs/Broadcasting.md
-    // =================================== 作业 ===================================
-    
-    return {};
-}
+        // =================================== 作业 ===================================
+        // TODO：对 A 和 B 进行双向广播，返回广播后的形状。
+        // REF: https://github.com/onnx/onnx/blob/main/docs/Broadcasting.md
+        // =================================== 作业 ===================================
+        Shape max = A.size() > B.size() ? A : B;
+        Shape min = A.size() > B.size() ? B : A;
+        for (size_t i = 0; i < min.size(); i++)
+        {
+            size_t idx_max = max.size() - 1 - i, idx_min = min.size() - 1 - i;
+            if (max[idx_max] != min[idx_min]){
+                if (max[idx_max] != 1 && min[idx_min] != 1)
+                    throw std::invalid_argument("Incompatible shapes for broadcasting");
+                else if (max[idx_max] == 1)
+                    max[idx_max] = min[idx_min];
+            }
+        }
+        return max;
+    }
+
 
 int get_real_axis(const int &axis, const int &rank) {
     IT_ASSERT(rank >= 1);

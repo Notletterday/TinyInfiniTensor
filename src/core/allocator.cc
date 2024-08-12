@@ -22,7 +22,6 @@ namespace infini
             runtime->dealloc(this->ptr);
         }
     }
-
     size_t Allocator::alloc(size_t size)
     {
         IT_ASSERT(this->ptr == nullptr);
@@ -32,6 +31,21 @@ namespace infini
         // =================================== 作业 ===================================
         // TODO: 设计一个算法来分配内存，返回起始地址偏移量
         // =================================== 作业 ===================================
+        if (this->freeBlocks.empty())
+            this->freeBlocks[0] = 1024;
+        for (auto it = this->freeBlocks.begin(); it != this->freeBlocks.end(); ++it)
+        {
+            if (it->second >= size)
+            {
+                if (it->second > size)
+                    this->freeBlocks[it->first + size] = it->second - size;
+                auto ans = it->first;
+                this->freeBlocks.erase(it);
+                this->used += size;
+                this->peak = (this->peak >= this->used) ? this->peak : this->used;
+                return ans;
+            }
+        }
 
         return 0;
     }
@@ -44,6 +58,21 @@ namespace infini
         // =================================== 作业 ===================================
         // TODO: 设计一个算法来回收内存
         // =================================== 作业 ===================================
+        this->freeBlocks[addr] = size;
+        auto it = this->freeBlocks.find(addr);
+        auto next = std::next(it);
+        if (next != this->freeBlocks.end() && it->first + it->second == next->first)
+        {
+            it->second += next->second;
+            this->freeBlocks.erase(next);
+        }
+        auto prev = std::prev(it);
+        if (prev != this->freeBlocks.begin() && prev->first + prev->second == it->first)
+        {
+            prev->second += it->second;
+            this->freeBlocks.erase(it);
+        }
+        this->used -= size;
     }
 
     void *Allocator::getPtr()

@@ -25,7 +25,7 @@ namespace infini
             if (input->getRank() != rank)
                 return std::nullopt;
         std::vector<int> outputDims(rank, 0);
-        for (auto input : inputs)
+        for (auto input : inputs){
             for (int i = 0; i < (int)rank; i++)
                 if (i == dim)
                     outputDims[i] += input->getDims()[i];
@@ -33,6 +33,8 @@ namespace infini
                     outputDims[i] = input->getDims()[i];
                 else if (outputDims[i] != input->getDims()[i])
                     return std::nullopt;
+        }
+
         return {{outputDims}};
     }
 

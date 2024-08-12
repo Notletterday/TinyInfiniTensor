@@ -152,6 +152,13 @@ namespace infini
                     removeOperator(op_next);
                     removeTensor(b);
                     removeTensor(c);
+
+                    op3->removePredecessors(op_next);
+                    if (a->getSource())
+                    {
+                        op3->addPredecessors(a->getSource());
+                        a->getSource()->addSuccessors(op3);
+                    }
                 }
             }
         }
@@ -205,6 +212,13 @@ namespace infini
                             tensor2->addTarget(op);
                             removeOperator(operator1);
                             removeTensor(tensor1);
+
+                            op->removePredecessors(operator1);
+                            if (tensor2->getSource())
+                            {
+                                op->addPredecessors(tensor2->getSource());
+                                tensor2->getSource()->addSuccessors(op);
+                            }
                         }
                     }
                 }
